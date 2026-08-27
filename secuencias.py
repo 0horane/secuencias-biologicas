@@ -7,6 +7,13 @@ def combinaciones_k(secuencia: str, k: int):
     res.sort()
     return res
 
+def combinaciones_kd(secuencia: str, k: int, d: int):
+    res = []
+    for i in range(len(secuencia) - (2*k + d) + 1):
+        res.append((secuencia[i:i+k], secuencia[i + k + d + 1:i + k + d + 1 + k]))
+    res.sort()
+    return res
+
 
 def stringFromPath(k_mers):
     res = k_mers[0]
@@ -115,6 +122,9 @@ def main():
 
     a = graph(test_eulerian, test_eulerian_names)
     print(a.eulerian_cycle())
+
+    print("\n\n\n\n\n\n", combinaciones_kd(example_string, 3, 1))
+
 
 if __name__ == "__main__":
     main()
