@@ -7,10 +7,10 @@ def combinaciones_k(secuencia: str, k: int):
     res.sort()
     return res
 
-def combinaciones_kd(secuencia: str, k: int, d: int):
+def combinaciones_de_pares(secuencia: str, k: int, d: int):
     res = []
     for i in range(len(secuencia) - (2*k + d) + 1):
-        res.append((secuencia[i:i+k], secuencia[i + k + d + 1:i + k + d + 1 + k]))
+        res.append((secuencia[i:i+k], secuencia[i + k + d:i + k + d + k]))
     res.sort()
     return res
 
@@ -20,6 +20,19 @@ def stringFromPath(k_mers):
     for k_mer in k_mers[1:]:
         res += k_mer[-1]
     return res
+
+def stringFromPathPares(kdMeros: list[tuple[str,str]], k:int, d:int):
+    primerasComponentes = [x[0] for x in kdMeros]
+    segundasComponentes = [x[1] for x in kdMeros]
+
+    stringPrimerasComponentes = stringFromPath(primerasComponentes)
+    stringSegundasComponentes = stringFromPath(segundasComponentes)
+
+    print(stringPrimerasComponentes[k + d:], "PRIMERA")
+    print(stringSegundasComponentes[:-(k + d)], "Segunda")
+    if((stringPrimerasComponentes[k + d:] == stringSegundasComponentes[:-(k + d)])):
+        return stringPrimerasComponentes+stringSegundasComponentes[-(k+d):]
+    return "There is no string spelled by the gaped pattern."
 
 class graph:
     def __init__(self, adyacencias, k_mers):
@@ -95,9 +108,10 @@ class graph:
 
 example_string = "TAATGCCATGGGATGTT"
 example_list = [example_string[i:i+3] for i in range(len(example_string)-2)]
+example_list212 = [(example_string[i:i+2],example_string[i + 3:i+5]) for i in range(len(example_string)-4)]
 
 
-def main():
+def testmain():
     #secuencia = input("input txt\n")
     #k = int(input("input len\n"))
     #print(combinaciones_k(secuencia, k))
@@ -123,9 +137,21 @@ def main():
     a = graph(test_eulerian, test_eulerian_names)
     print(a.eulerian_cycle())
 
-    print("\n\n\n\n\n\n", combinaciones_kd(example_string, 3, 1))
+    print("\n\n\n\n\n\n", combinaciones_de_pares(example_string, 3, 1))
+    print(example_list212)
+    print(example_string)
+    print(stringFromPathPares(example_list212,2,1))
+
+def carsonellaRuddiiMain():
+    with open("CarsonellaRuddii.txt") as genome:
+        k_mers = genome.read().splitlines()
+    graph.from_overlap(k_mers)
+    
+
 
 
 if __name__ == "__main__":
-    main()
+    #testmain()
+
+    carsonellaRuddiiMain()
 
