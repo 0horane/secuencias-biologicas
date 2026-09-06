@@ -10,28 +10,36 @@ def carsonellaRuddiiMain():
     with open("CarsonellaRuddii.txt") as genome:
         genome = "".join(genome.read().splitlines())
         
-    genome2 = "ACAAAACTTTCTAAATGTTTTCTAGAAAACATTATTATTGTTGCACCTGGTGATTCATA"
-    k_mers = sec.combinaciones_k(genome2,5)
+    #genome2 =  "weriopsdfghjkvbn" # genome
+    genome2 =  genome 
 
-    debrujin_graph = sec.graph.from_overlap(k_mers)
+    print("calculando combinaciones")
+    k_mers = sec.combinaciones_k(genome2,151)
+    print("calculando overlap")
+
+    debrujin_graph = sec.graph.from_overlap(k_mers, debug=True)
+    #debrujin_graph.print_overlap()
+    print("uniendo puntas")
     nodo_inicial = debrujin_graph.unir_puntas()
-    debrujin_graph.print_overlap()
+    print("contnado ciclos eulerianos")
 
-    count = debrujin_graph.count_eulerian_cycles_BEST()
-    if count > 1:
-        print("No es posible reconstruir la secuencia original")
+    #count = debrujin_graph.count_eulerian_cycles_BEST()
+    #if count > 1:
+    #    print("No es posible reconstruir la secuencia original")
+    print("calculando ciclos eulerianosa")
     ciclo = debrujin_graph.eulerian_cycle()
 
-    print( [debrujin_graph.k_mers[i] for i in ciclo])
+    #print( [debrujin_graph.k_mers[i] for i in ciclo])
 
+    print("rotando ciclo")
     ciclo_alineado_al_principio = rotar_ciclo_hasta(ciclo, nodo_inicial)
 
     k_meros_ordenados = [debrujin_graph.k_mers[i] for i in ciclo_alineado_al_principio]
-    print(k_meros_ordenados)
-    genoma = sec.stringFromPath(k_meros_ordenados)
+    #print(k_meros_ordenados)
+    res = sec.stringFromPath(k_meros_ordenados)
 
-    print(genoma)    
-    print(genome2)    
+    print(res == genome2)    
+    #print(genome2)    
 
 
 

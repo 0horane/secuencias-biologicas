@@ -1,6 +1,7 @@
 from copy import deepcopy
 import numpy as np
 from math import factorial
+from collections import defaultdict
 # Separa string en kmeros de longitud K
 def combinaciones_k(secuencia: str, k: int):
     res = []
@@ -47,15 +48,20 @@ class graph:
         
     # toma lista de kmeros, genera grafo de ahi
     @classmethod
-    def from_overlap(cls, k_mers):
+    def from_overlap(cls, k_mers, debug=False):
+        prefix_to_graph = defaultdict(list)
+        for i,k_mer in enumerate(k_mers):
+            prefix_to_graph[k_mer[:-1]].append(i)
+
         graph = []
         for i, k_mer1 in enumerate(k_mers):
-            adyacencias = list()
+            if debug and i % 1000 == 0:
+                print(i,"/",len(k_mers))
+            adyacencias = prefix_to_graph[k_mer1[1:]].copy()
             graph.append(adyacencias)
-            for j, k_mer2 in enumerate(k_mers):
-                if k_mer1[1:] == k_mer2[:-1]:
-                    adyacencias.append(j)
+
         return cls(graph, k_mers)
+
 
     @classmethod
     def debrujin_from_text(cls, k, text):
@@ -84,13 +90,13 @@ class graph:
                 
     # une un nodo final y terminal del grafo. supone que son unicos
     def unir_puntas(self) -> int:
-        print(list(zip(self.in_degree(),self.out_degree())))
+        #print(list(zip(self.in_degree(),self.out_degree())))
         for (i, (indeg, outdeg)) in enumerate(zip(self.in_degree(), self.out_degree())):
             if indeg > outdeg:
                 punta_final = i
             elif outdeg > indeg:
                 punta_inicial= i
-        print(punta_inicial, punta_final,self.k_mers[punta_inicial],self.k_mers[punta_final] )
+        #print(punta_inicial, punta_final,self.k_mers[punta_inicial],self.k_mers[punta_final] )
         self.adyacencias[punta_final].append(punta_inicial)
         return punta_inicial
 
