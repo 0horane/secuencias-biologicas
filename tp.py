@@ -11,10 +11,13 @@ def carsonellaRuddiiMain():
         genome = "".join(genome.read().splitlines())
         
     genome2 = "ACAAAACTTTCTAAATGTTTTCTAGAAAACATTATTATTGTTGCACCTGGTGATTCATA"
-    k_mers = sec.combinaciones_k(genome2,5)
+    k_mers = sec.combinaciones_k(genome,5)
 
     debrujin_graph = sec.graph.from_overlap(k_mers)
+    print("Grafo sin unir puntas:")
+    debrujin_graph.print_overlap()
     nodo_inicial = debrujin_graph.unir_puntas()
+    print("Grafo con las puntas unidas:")
     debrujin_graph.print_overlap()
 
     count = debrujin_graph.count_eulerian_cycles_BEST()

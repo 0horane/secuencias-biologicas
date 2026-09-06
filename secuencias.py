@@ -42,8 +42,8 @@ def stringFromPathPares(kdMeros: list[tuple[str,str]], k:int, d:int):
 class graph:
     def __init__(self, adyacencias, k_mers):
         
-        self.adyacencias : List[List[int]] = adyacencias
-        self.k_mers : List[str] = k_mers
+        self.adyacencias : list[list[int]] = adyacencias
+        self.k_mers : list[str] = k_mers
         
     # toma lista de kmeros, genera grafo de ahi
     @classmethod
