@@ -78,20 +78,19 @@ class graph:
             for adyacente in nodo:
                 in_degree_list[adyacente]+=1
         return in_degree_list
+
+    def out_degree(self):
+        return [len(x) for x in self.adyacencias]
                 
     # une un nodo final y terminal del grafo. supone que son unicos
     def unir_puntas(self) -> int:
-        punta_final = None
-        for i,nodo in enumerate(self.adyacencias):
-            if len(nodo)==0:
+        print(list(zip(self.in_degree(),self.out_degree())))
+        for (i, (indeg, outdeg)) in enumerate(zip(self.in_degree(), self.out_degree())):
+            if indeg > outdeg:
                 punta_final = i
-        try:
-            punta_inicial = self.in_degree().index(0)
-        except ValueError:
-            raise "El grafo no tiene ningun nodo inicial"
-        if punta_final == None:
-            raise "El grafo no tiene ningun nodo terminal"
-
+            elif outdeg > indeg:
+                punta_inicial= i
+        print(punta_inicial, punta_final,self.k_mers[punta_inicial],self.k_mers[punta_final] )
         self.adyacencias[punta_final].append(punta_inicial)
         return punta_inicial
 
@@ -101,6 +100,7 @@ class graph:
     def matriz_adyacencia_ne_conInDegree(self):
         
         matriz = np.zeros((len(self.k_mers), len(self.k_mers)), dtype=int)
+
         for i, nodo in enumerate(self.adyacencias):
             for adyacente in nodo:
                 matriz[i][adyacente] = -1
@@ -110,7 +110,6 @@ class graph:
         for i in range(len(indegree)):
             matriz[i][i] = indegree[i]
 
-        print(matriz)
         return matriz
 
     def count_eulerian_cycles_BEST(self):
@@ -120,10 +119,10 @@ class graph:
         
         res = cofactor
         for i in range(matrizNegadaConInDegree.shape[0]):
+            print(matrizNegadaConInDegree[i][i])
             res = res * factorial(matrizNegadaConInDegree[i][i] - 1)
-        
-        print(cofactor)
-        print(res)
+        #res = int(res)
+        print(format(res.astype(int),'.17f'))
         return res
         
 
@@ -135,7 +134,6 @@ class graph:
         while nodo != 0:
             ciclo.append(nodo)
             nodo = aristas[nodo].pop(0)
-        ciclo.append(0)
 
         while sum([len(i) for i in aristas]) != 0:
             i = 0
@@ -150,14 +148,14 @@ class graph:
                 ciclonuevo.append(nodo)
                 nodo = aristas[nodo].pop(0)
 
+            #ciclo = ciclo[:ciclo.index(nodo_original)] + ciclonuevo + ciclo[ciclo.index(nodo_original):]
             ciclo[ciclo.index(nodo_original):ciclo.index(nodo_original)] = ciclonuevo
-
         return ciclo
 
 
     def print_overlap(self):
         for i, k_mer1 in enumerate(self.k_mers):
-            print(k_mer1, "->", ",".join([self.k_mers[j] for j in self.adyacencias[i] ]))
+            print(k_mer1, "->", ",".join([self.k_mers[j] for j in self.adyacencias[i]]))
 
 example_string = "TAATGCCATGGGATGTT"
 example_list = [example_string[i:i+3] for i in range(len(example_string)-2)]
