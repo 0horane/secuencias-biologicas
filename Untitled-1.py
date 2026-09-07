@@ -90,7 +90,7 @@ def main():
     #print(longest_common_subsequence3(list('GCCCAGTCTATGTCAGGGGGCACGAGCATGCACA'), list('GCCGCCGTCGTTTTCAGCAGTTATGTTCAGAT')))
     #print(longest_common_subsequence2(islice('GCCCAGTCTATGTCAGGGGGCACGAGCATGCACA',None), islice('GCCGCCGTCGTTTTCAGCAGTTATGTTCAGAT',None)))
     
-    print("res",south_or_east_dyn(4,4,derecha,abajo))
+    print("res",south_or_east_dyn(4, 4, derecha, abajo))
 
 if __name__ == "__main__":
     main()

@@ -34,8 +34,8 @@ def stringFromPathPares(kdMeros: list[tuple[str,str]], k:int, d:int):
     stringPrimerasComponentes = stringFromPath(primerasComponentes)
     stringSegundasComponentes = stringFromPath(segundasComponentes)
 
-    print(stringPrimerasComponentes[k + d:], "PRIMERA")
-    print(stringSegundasComponentes[:-(k + d)], "Segunda")
+    #print(stringPrimerasComponentes[k + d:], "PRIMERA")
+    #print(stringSegundasComponentes[:-(k + d)], "Segunda")
     if((stringPrimerasComponentes[k + d:] == stringSegundasComponentes[:-(k + d)])):
         return stringPrimerasComponentes+stringSegundasComponentes[-(k+d):]
     return "There is no string spelled by the gaped pattern."
@@ -62,21 +62,36 @@ class graph:
 
         return cls(graph, k_mers)
 
-
     @classmethod
-    def debrujin_from_text(cls, k, text):
-        k_mers = set()
-        for i in range(len(text) - k + 2):
-            k_mers.add(text[i:i+k-1])
-        k_mers = list(k_mers)
-        print(k_mers)
-        adyacencias = [[] for i in range(len(k_mers))]
-        for i in range(len(text) - k + 1):
-            solapamiento1 = text[i:i+k-1]
-            solapamiento2 = text[i+1:i+k]
-            adyacencias[k_mers.index(solapamiento1)].append(k_mers.index(solapamiento2))
-        return cls(adyacencias, k_mers)
-        
+    def from_overlap_pares(cls, kd_mers, debug=False):
+            prefixes_to_graph :list[tuple[str,str]]= defaultdict(list)
+            for i,(kd_mer_1, kd_mer_2) in enumerate(kd_mers):
+                prefixes_to_graph[(kd_mer_1[:-1],kd_mer_2[:-1])].append(i)
+    
+            graph = []
+            for i, (kd_mer_1, kd_mer_2) in enumerate(kd_mers):
+                if debug and i % 1000 == 0:
+                    print(i,"/",len(kd_mers))
+                adyacencias = prefixes_to_graph[(kd_mer_1[1::],kd_mer_2[1::])].copy()
+                graph.append(adyacencias)
+    
+            return cls(graph, kd_mers)
+
+    # la comentamos pq no se usa
+        # @classmethod
+        # def debrujin_from_text(cls, k, text):
+        #     k_mers = set()
+        #     for i in range(len(text) - k + 2):
+        #         k_mers.add(text[i:i+k-1])
+        #     k_mers = list(k_mers)
+        #     print(k_mers)
+        #     adyacencias = [[] for i in range(len(k_mers))]
+        #     for i in range(len(text) - k + 1):
+        #         solapamiento1 = text[i:i+k-1]
+        #         solapamiento2 = text[i+1:i+k]
+        #         adyacencias[k_mers.index(solapamiento1)].append(k_mers.index(solapamiento2))
+        #     return cls(adyacencias, k_mers)
+         
     
     def in_degree(self):
         in_degree_list = [0 for x in self.adyacencias]
