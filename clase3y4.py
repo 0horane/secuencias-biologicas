@@ -1,5 +1,6 @@
 from itertools import islice
 import numpy as np
+from functools import cache
 
 def south_or_east(i,j,derecha,abajo):
     if i == j == 0:
@@ -39,7 +40,7 @@ def south_or_east_dyn(n,m,derecha,abajo):
     print(cache)
     return cache[-1][-1]
 
-
+@cache
 def longest_common_subsequence(str1, str2):
     if str1 == '' or str2 == '':
         return 0
@@ -66,6 +67,7 @@ def longest_common_subsequence2(str1, str2):
 """
 
 def longest_common_subsequence3(str1, str2, i, j):
+
     if str1 == '' or str2 == '':
         return 0
 
@@ -76,21 +78,63 @@ def longest_common_subsequence3(str1, str2, i, j):
         longest_common_subsequence(str1[1:], str2), 
         longest_common_subsequence(str1, str2[1:]))
 
+def LCSBacktrack(v, w):
+
+    s = np.zeros((len(v)+1,len(w)+1))
+    backtrack = np.zeros((len(v), len(w)))
+    for i in range(len(w)):
+        s[i][0] = 0
+    for j in range(len(v)):
+        s[0][j] = 0
+    for i in range(1, len(v)):
+        for j in range(1, len(w)):
+            s[i][j] = max(s[i-1][j], s[i][j-1], s[i-1][j-1] + 1 if v[i]== w[j] else -9999999999 )
+            if s[i][j] == s[i-1][j]:
+                backtrack[i][j] = 1 #ABAJO
+            elif s[i][j] == s[i][j-1]:
+                backtrack[i][j] = 2 #DERECHA
+            elif s[i][j] == s[i-1][j-1]+1 and v[i] == v[j]:
+                backtrack[i][j] = 3 #DIAGONAL
+    return backtrack
+
+def outputLCS(backtrack, v, i, j):
+    if i < 0 or j < 0:
+        return ""
+
+    if backtrack[i][j] == 1:
+        return outputLCS(backtrack, v, i-1, j) + "-"
+    elif backtrack[i][j] == 2:
+        return outputLCS(backtrack, v, i, j-1)+"|"
+    else:
+        return outputLCS(backtrack, v, i-1, j-1)+v[i]
+
+    return v[i]
 
 def main():
+    """
     with open("Derecha.txt") as derechaFile:
         derecha = [[int(y) for y in x.split(",")] for x in derechaFile.read().splitlines()]
     with open("Abajo.txt") as abajoFile:
         abajo = [[int(y) for y in x.split(",")] for x in abajoFile.read().splitlines()]
+    
     print(np.array(derecha))
     print(np.array(abajo))
     print(south_or_east(4,4,derecha,abajo))
-
+    """
     #print(longest_common_subsequence('GCCCAGTCTATGTCAGGGGGCACGAGCATGCACA', 'GCCGCCGTCGTTTTCAGCAGTTATGTTCAGAT'))
+    v = 'ATGTTATA'
+    w = 'ATCGTCC'
+    i = len(v)
+    j = len(w)
+    print(longest_common_subsequence('ATGTTATA', 'ATCGTCC'))
+    backtrack = LCSBacktrack('ATGTTATA', 'ATCGTCC')
+    print(backtrack)
+    print(outputLCS(backtrack, v, i-1, j-1))
+
     #print(longest_common_subsequence3(list('GCCCAGTCTATGTCAGGGGGCACGAGCATGCACA'), list('GCCGCCGTCGTTTTCAGCAGTTATGTTCAGAT')))
     #print(longest_common_subsequence2(islice('GCCCAGTCTATGTCAGGGGGCACGAGCATGCACA',None), islice('GCCGCCGTCGTTTTCAGCAGTTATGTTCAGAT',None)))
     
-    print("res",south_or_east_dyn(4, 4, derecha, abajo))
+    #print("res",south_or_east_dyn(4, 4, derecha, abajo))
 
 if __name__ == "__main__":
     main()
