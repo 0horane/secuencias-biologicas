@@ -1,7 +1,8 @@
 from copy import deepcopy
 import numpy as np
 from math import factorial
-from collections import defaultdict
+from collections import defaultdict, Counter
+
 # Separa string en kmeros de longitud K
 def combinaciones_k(secuencia: str, k: int):
     res = []
@@ -49,33 +50,43 @@ class graph:
     # toma lista de kmeros, genera grafo de ahi
     @classmethod
     def from_overlap(cls, k_mers, debug=False):
+        distinct_kmers = list(set(k_mers))
+        distinct_kmer_index = { kmer:i for (i,kmer) in enumerate(distinct_kmers) }
         prefix_to_graph = defaultdict(list)
+
         for i,k_mer in enumerate(k_mers):
-            prefix_to_graph[k_mer[:-1]].append(i)
+            if k_mer == "ATTTTTTTATTTATTAAAAAAAATTTTTTT":
+                print("RARO A")
+            if k_mer == "TTTTTTTATTTATTAAAAAAAATTTTTTTT":
+                print("RARO B")
+            prefix_to_graph[k_mer[:-1]].append(distinct_kmer_index[k_mer])
 
         graph = []
-        for i, k_mer1 in enumerate(k_mers):
+        for i, k_mer1 in enumerate(distinct_kmers):
             if debug and i % 1000 == 0:
-                print(i,"/",len(k_mers))
+                print(i,"/",len(distinct_kmers))
+            
             adyacencias = prefix_to_graph[k_mer1[1:]].copy()
             graph.append(adyacencias)
 
-        return cls(graph, k_mers)
+        return cls(graph, distinct_kmers)
 
     @classmethod
     def from_overlap_pares(cls, kd_mers, debug=False):
-            prefixes_to_graph :list[tuple[str,str]]= defaultdict(list)
+            distinct_kdmers = list(set(kd_mers))
+            distinct_kdmer_index = { kmer:i for (i,kmer) in enumerate(distinct_kdmers) }
+            prefixes_to_graph = defaultdict(list)
             for i,(kd_mer_1, kd_mer_2) in enumerate(kd_mers):
-                prefixes_to_graph[(kd_mer_1[:-1],kd_mer_2[:-1])].append(i)
+                prefixes_to_graph[(kd_mer_1[:-1],kd_mer_2[:-1])].append(distinct_kdmer_index[(kd_mer_1, kd_mer_2)])
     
             graph = []
-            for i, (kd_mer_1, kd_mer_2) in enumerate(kd_mers):
+            for i, (kd_mer_1, kd_mer_2) in enumerate(distinct_kdmers):
                 if debug and i % 1000 == 0:
-                    print(i,"/",len(kd_mers))
+                    print(i,"/",len(distinct_kdmers))
                 adyacencias = prefixes_to_graph[(kd_mer_1[1::],kd_mer_2[1::])].copy()
                 graph.append(adyacencias)
     
-            return cls(graph, kd_mers)
+            return cls(graph, distinct_kdmers)
 
     # la comentamos pq no se usa
         # @classmethod
@@ -105,14 +116,31 @@ class graph:
                 
     # une un nodo final y terminal del grafo. supone que son unicos
     def unir_puntas(self) -> int:
+        min_indeg = np.inf
+        min_outdeg = np.inf
         #print(list(zip(self.in_degree(),self.out_degree())))
+        print("a")
+        a=list(zip(self.in_degree(),self.out_degree()))
+        print("b")
+        counts = Counter(a)
+        
+        print(counts)
+
         for (i, (indeg, outdeg)) in enumerate(zip(self.in_degree(), self.out_degree())):
-            if indeg > outdeg:
+            if indeg != outdeg:
+                print(i)
+                print(indeg, outdeg, self.k_mers[i],self.adyacencias[i], [self.k_mers[j] for j in self.adyacencias[i]])
+                print(indeg, outdeg, "\\n*".join(list(self.k_mers[i])), ["\n*".join(list(self.k_mers[j])) for j in self.adyacencias[i]])
+            if indeg > outdeg and outdeg < min_outdeg:
+                min_outdeg = outdeg
                 punta_final = i
-            elif outdeg > indeg:
-                punta_inicial= i
+            elif outdeg > indeg and indeg < min_indeg:
+                min_indeg = indeg
+                punta_inicial = i
         #print(punta_inicial, punta_final,self.k_mers[punta_inicial],self.k_mers[punta_final] )
+        print("d")
         self.adyacencias[punta_final].append(punta_inicial)
+        print("e")
         return punta_inicial
 
 
@@ -175,8 +203,11 @@ class graph:
 
 
     def print_overlap(self):
-        for i, k_mer1 in enumerate(self.k_mers):
-            print(k_mer1, "->", ",".join([self.k_mers[j] for j in self.adyacencias[i]]))
+        if len(self.k_mers) > 20:
+            print("too long will break")
+        else:
+            for i, k_mer1 in enumerate(self.k_mers):
+                print(k_mer1, "->", ",".join([self.k_mers[j] for j in self.adyacencias[i]]))
 
 example_string = "TAATGCCATGGGATGTT"
 example_list = [example_string[i:i+3] for i in range(len(example_string)-2)]

@@ -10,9 +10,9 @@ def carsonellaRuddiiMain():
     with open("CarsonellaRuddii.txt") as genome:
         genome = "".join(genome.read().splitlines())
 
-    k = 76
-    d = 0
-    res = run_test_on_genome(genome,k, d)
+    k = 30
+    d = None
+    res = run_test_on_genome(genome[:100000], k, d, debug=False)
     print(res)
     
 def run_test_on_genome(genome,k,d=None, debug=False):
